@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Start Page</title>
+        <meta charset="UTF-8"/>
+        <link rel="stylesheet" type="text/css" href="css/guide.css"/>
+    </head>
+    <body>
+        <h1>Game technical guide</h1>
+        <p>The objective of the game is to make score points. All other values means nothing to the end of 'winning', but solely to make score points. A top 10 will be made on base on the score points and the higher is the current winning player.</p>
+        
+        <h2>Profile values</h2>
+        <p>Other player values are: strength, land, energy and rage.</p>
+        
+        <h3>Strength</h3>
+        <p>This value is used when attacking, and is one of the key values for determining the attack power.</p>
+        <p><b>How it grows:</b> it can be boosted by 5% by each spent 10% energy, and it can also grow by passive tasking, if strength is selected, by 0.1% per minute. It can also grow if you win an attack as a defender, in this case you will steal some of the attacker's strength.</p>
+        <p><b>How it's lost:</b> if you are the attacker and lose the attack, you will lose some of your strength to the defender.</p>
+        
+        <h3>Land</h3>
+        <p>This value is used for two purposes: it's considered a key value when defending, and the energy gain per minute is multiplied by this percentage. The higher land, the higher energy rate will be gained per minute.</p>
+        <p><b>How it grows:</b> it can be boosted, just like strength, by 5% using 10% of energy each time. Also it's what you steal from an opponent when you are a winning attacker. You can also select the passive task for gaining 0.1% per minute of land.</p>
+        <p><b>Hot it's lost: </b> if you are the defender and you lose the attack, you will lose some of your land to the attacker, depending on the power of the attack.</p>
+        
+        <h3>Energy</h3>
+        <p>Energy is the basic value used for attacks and other bonus tricks.</p>
+        <p><b>How it grows:</b> you will get some of the adversary energy if you're a defender (either if you win or lose), and you will also grow in energy in time. The amount of energy gained per minute is: 0.1% + (1% of land value).</p>
+        <p><b>How it's lost: </b> you will lose energy when attacking (successfully or not, but not when it's a tie). You can also spend 10% of energy to gain either 5% of land or 5% of strength.</p>
+        
+        <h3>Rage</h3>
+        <p>Rage is a special value that balances the game, in aid of a frequently attacked player.</p>
+        <p><b>How it grows: </b> you gain 1% of rage each time you get attacked, either if the attacker was winning or not.</p>
+        <p><b>Hot it's lost:</b> you lose 1% of race each time you attack, but the rage value will also add to your attack power.</p>
+        
+        <h2>Attacking</h2>
+        <p>When you attack a player, your aim is to gain land and score. With land, your energy will regenerate more quickly, and with score you will be winning the game.</p>
+        <p>When you attack, each player determines their combat power. (<b>x</b> = percentages are applied togheter, ex. if you have 30% and 50%, it means 50% of 30, which is 15%)</p>
+        <p><b>For attackers:</b> strength <b>x</b> energy + rage = AP (attacker power)</p>
+        <p><b>For defenders:</b> land <b>x</b> 90% <b>x</b> energy + rage = DP (defender power)</p>
+        <p>Now, calculate AP - DP = P, and if it's lower than -1%, the defender won, if higher than 1%, the attacker won instead. Values between -1% and 1% are considered a tie, meaning that no effect is applied and attack won't even appear on history.</p>
+        <p><b>When attacker is winning:</b> attacker loses P% of his energy, and gains the least of P% of either user's land value. Defender loses his own P% of land, but gains P% of his own energy. Defender gains 1% of rage.</p>
+        <p><b>When defender is winning:</b> attacker loses P% of his energy and P% of his own strength, while defender gains P% of his own energy and the least of P% of either user's strength value. Defender gains 1% of rage.</p>
+        
+    </body>
+</html>

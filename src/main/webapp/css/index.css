@@ -1,0 +1,11 @@
+
+@import "inc/base.css";
+
+table#targets
+    {border-collapse: collapse; margin: 10px}
+    
+table#targets td
+    {border: solid 1px black; padding: 3px 5px}
+    
+table#targets td.username
+    {text-decoration: underline; color: blue; cursor: pointer}

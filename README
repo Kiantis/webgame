@@ -1,0 +1,24 @@
+
+Project configuration
+=====================
+
+USE:
+
+* Netbeans 7.4
+* JDK 8
+* Tomcat 7
+
+Configure tomcat JNDI resources as:
+(to put inside <GlobalNamingResources> in server.xml of Tomcat)
+
+    <Resource name="mail/webgame" auth="Container" type="javax.mail.Session" mail.smtp.host="localhost"/>
+
+    <Resource name="jdbc/webgame"
+      auth="Container"
+      type="javax.sql.DataSource" 
+      username="webgame" 
+      password="webgame"
+      driverClassName="com.mysql.jdbc.Driver"
+      url="jdbc:mysql://localhost:3306/webgame"
+      maxActive="50"
+      maxIdle="10"/>

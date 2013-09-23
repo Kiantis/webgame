@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Login</title>
+        <meta charset="UTF-8"/>
+        <script type="text/javascript" src="js/jquery-2.0.3.min.js"></script>
+        <script type="text/javascript">
+            function login()
+            {
+                $.ajax(
+                {
+                    url: "login",
+                    method: "post",
+                    data: {username: $("#username").val(), password: $("#password").val()},
+                    dataType: "json",
+                    success: function (data)
+                    {
+                        if (data)
+                            location.href = "index.html";
+                        else
+                            alert("Bad login");
+                    }
+                });
+                // do not really submit the form
+                return false;
+            }
+        </script>
+        <style type="text/css">
+            body
+                {text-align: center}
+            form
+                {margin: 0 auto; width: 230px}
+            input[type="text"], input[type="password"]
+                {color: black; margin-left: 80px; display: block; width: 120px}
+            input[type="text"].checking
+                {color: gray}
+            input[type="text"].ok
+                {color: green}
+            input[type="text"].error, input[type="password"].error
+                {color: red; border-color: red;}
+            label
+                {float: left; display: block; text-align: right; width: 100px; padding-right: 3px}
+            button
+                {display: block; margin-left: 103px}
+        </style>
+    </head>
+    <body>
+        <h1></h1>
+        <form onsubmit="return login()">
+            <label for="username">Username:</label><input id="username" type="text" name="username"/>
+            <div style="clear: both"></div>
+            <label for="password">Password:</label><input id="password" type="password" name="password"/>
+            <div style="clear: both"></div>
+            <button type="submit">Login</button> <button type="button" onclick="location.href='register.html'">Register</button>
+        </form>
+    </body>
+</html>

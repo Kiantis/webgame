@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Start Page</title>
+        <meta charset="UTF-8"/>
+        <link rel="stylesheet" type="text/css" href="css/index.css"/>
+        <script type="text/javascript" src="js/jquery-2.0.3.min.js"></script>
+        <script type="text/javascript" src="js/index.js"></script>
+    </head>
+    <body>
+    
+        <a href="javascript:void(0)" onclick="logout()">logout</a> |
+        <a href="guide.html">guide</a>
+    
+        <div id="statsbox">
+            <h>Profile of <span id="username"></span></h>
+            <div id="stats-score">Score: <span id="stats-value-score"></span></div>
+            <div id="stats-strength">Strength: <span id="stats-value-strength"></span></div>
+            <div id="stats-land">Land: <span id="stats-value-land"></span></div>
+            <div id="stats-energy">Energy: <span id="stats-value-energy"></span></div>
+            <div id="stats-rage">Rage: <span id="stats-value-rage"></span></div>
+            <div id="stats-nextupdate">Next update at <span id="stats-value-nextupdate"></span> server time</div>
+            <br/>
+            <h>BOOST values (need 10% energy each):</h>
+            <button id="boost-strength">STRENGTH</button>
+            <button id="boost-land">LAND</button>
+            <br/>
+            <h>Selected passive Task:</h>
+            <button id="task-strength">STRENGTH</button>
+            <button id="task-land">LAND</button>
+        </div>
+        
+        <br/>
+        <h1>Attack</h1>
+        <h3>(last attack result)</h3>
+        <div id="last-attack-result">(no result)</div>
+        <a href="attackshistory.html">Attacks history</a>
+        <h3>Attack users</h3>
+        <p>Here is the list of users and their land value (users with less than 10% land will not be listed here).</p>
+        <p>Click on the username to attack it.</p>
+        <table id="targets">
+            <thead>
+                <th>Username</th>
+                <th>Land</th>
+                <th>Last attacked by</th>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+        
+    </body>
+</html>

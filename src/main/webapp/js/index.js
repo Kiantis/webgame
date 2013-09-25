@@ -1,4 +1,9 @@
 
+var COLOR_STRENGTH = "#906030";
+var COLOR_LAND = "#009000";
+var COLOR_ENERGY = "#0000FF";
+var COLOR_RAGE = "#FF0000";
+
 function getstats()
 {
     $.ajax(
@@ -15,11 +20,11 @@ function getstats()
             data.strength = data.strength > 1 ? 1 : data.strength;
             data.land = data.land > 1 ? 1 : data.land;
             data.energy = data.energy > 1 ? 1 : data.energy;
-            $("#stats-value-strength").text((data.strength * 100).toFixed(1) + "%");
-            $("#stats-value-land").text((data.land * 100).toFixed(1) + "%");
-            $("#stats-value-energy").text((data.energy * 100).toFixed(1) + "%");
-            $("#stats-value-rage").text((data.rage * 100).toFixed(1) + "%");
-
+            drawStat("strength", parseFloat(data.strength));
+            drawStat("land", parseFloat(data.land));
+            drawStat("energy", parseFloat(data.energy));
+            drawStat("rage", parseFloat(data.rage));
+            
             if (data.energy < 0.1)
                 $("#boost-strength, #boost-land").attr("disabled", "disabled");
             else
@@ -78,6 +83,27 @@ function getstats()
                 td.addClass("last-attacker");
                 tr.append(td);
                 $("#targets tbody").append(tr);
+            }
+        }
+    });
+    $.ajax(
+    {
+        url: "getscores",
+        method: "post",
+        dataType: "json",
+        success: function (data)
+        {
+            $("#scorebox-values tbody").empty();
+            for (var i = 0; i < data.length; i++)
+            {
+                var tr = $("<tr>");
+                var td = $("<td>");
+                td.html(data[i].score);
+                tr.append(td);
+                var td = $("<td>");
+                td.html(data[i].username);
+                tr.append(td);
+                $("#scorebox-values tbody").append(tr);
             }
         }
     });
@@ -177,8 +203,63 @@ function spendenergy(task)
     });
 }
 
+function drawStat(type, value)
+{
+    var id = "";
+    var color = "";
+    switch (type)
+    {
+        case "strength":
+            id = "stats-value-strength";
+            color = COLOR_STRENGTH;
+            break;
+        case "land":
+            id = "stats-value-land";
+            color = COLOR_LAND;
+            break;
+        case "energy":
+            id = "stats-value-energy";
+            color = COLOR_ENERGY;
+            break;
+        case "rage":
+            id = "stats-value-rage";
+            color = COLOR_RAGE;
+            break;
+        default:
+            return;
+    }
+    
+    var element = $("canvas#"+id);
+    var w = element.width();
+    var h = element.height();
+    var minlen = w < h ? w : h;
+    element.clearCanvas();
+    element.drawArc(
+    {
+        strokeStyle: color,
+        strokeWidth: minlen/16,
+        x: w/2, y: h/2,
+        radius: minlen/2 - minlen/16,
+        // start and end angles in degrees
+        start: 0, end: value*360
+    })
+    .drawText(
+    {
+        fillStyle: color,
+        x: w/2, y: h/2,
+        fontSize: minlen/4.5,
+        fontFamily: "sans-serif",
+        text: (value *100).toFixed(1)
+    });
+}
+
 $(document).ready(function ()
 {
+    $("#stats-legend-strength").css({"background-color": COLOR_STRENGTH});
+    $("#stats-legend-land").css({"background-color": COLOR_LAND});
+    $("#stats-legend-energy").css({"background-color": COLOR_ENERGY});
+    $("#stats-legend-rage").css({"background-color": COLOR_RAGE});
+    
     $.ajax(
     {
         url: "isloggedin",
@@ -217,5 +298,5 @@ $(document).ready(function ()
     $("#boost-land").click(function (){spendenergy("L");});
 
     getstats();
-    var timer = setInterval(getstats, 10000);
+    var timer = setInterval(getstats, 30000);
 });

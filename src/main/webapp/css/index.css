@@ -9,3 +9,43 @@ table#targets td
     
 table#targets td.username
     {text-decoration: underline; color: blue; cursor: pointer}
+    
+    
+.leftbox
+    {width: 250px; float: left; margin: 0 0 0 10px}
+
+.statsbox
+    {text-align: center; border-radius: 10px; border: solid 1px black; padding: 10px 0}
+
+.statsbox p
+    {padding: 0; margin: 0; line-height: 1.7em}
+
+.statsbox-canvasbox
+    {}
+    
+.statsbox canvas
+    {margin: 10px 5px}
+    
+.statsbox hr
+    {border: 0; background: transparent; border-bottom: solid 1px black}
+    
+.stats-legend
+    {text-align: left}
+    
+.stats-legend table
+    {margin: 0 auto}
+
+.stats-legend-value
+    {padding: 12px 12px 0 0; line-height: 1px; font-size: 1px; background: black}
+    
+.scorebox
+    {border-radius: 10px; border: solid 1px black; padding: 10px 0; margin-top: 10px}
+
+.scorebox table
+    {margin: 0 auto}
+    
+.scorebox table td, .scorebox table th
+    {padding: 3px 5px}
+
+.attackbox
+    {margin-left: 280px}

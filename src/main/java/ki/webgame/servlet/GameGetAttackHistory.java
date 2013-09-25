@@ -26,8 +26,6 @@ public class GameGetAttackHistory extends HttpServlet
         String username = (String) request.getSession().getAttribute(Login.SES_ATT_USERNAME);
         try
         {
-            GameEngine.checkHourly();
-            
             new DBQuery("select "
                 + "attack_time, "
                 + "result, "

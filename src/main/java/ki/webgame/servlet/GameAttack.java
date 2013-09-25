@@ -27,6 +27,8 @@ public class GameAttack extends HttpServlet
         String attackeduser = request.getParameter(REQ_PAR_ATTACKED_USER);
         try
         {
+            GameEngine.checkHourly();
+            
             GameEngine.AttackStats attackResponse = GameEngine.attack(username, attackeduser);
             response.setContentType("text/json");
             JSONBuilder jb = new JSONBuilder();

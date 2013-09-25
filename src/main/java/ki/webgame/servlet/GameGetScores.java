@@ -1,19 +1,29 @@
 package ki.webgame.servlet;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.ResultSet;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import ki.webgame.DBQuery;
 import ki.webgame.GameEngine;
-import static ki.webgame.GameEngine.spendenergy;
+import ki.webgame.JSONBuilder;
 
-@WebServlet("/spendenergy")
-public class GameSpendEnergy extends HttpServlet
+@WebServlet("/getscores")
+public class GameGetScores extends HttpServlet
 {
-    private static final String REQ_PAR_TASK = "task";
+    private static final int MAX_SCORES = 20;
     
+    /** 
+     * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException
     {
@@ -23,12 +33,24 @@ public class GameSpendEnergy extends HttpServlet
             return;
         }
         
-        String username = (String) request.getSession().getAttribute(Login.SES_ATT_USERNAME);
-        String task = request.getParameter(REQ_PAR_TASK);
         try
         {
-            GameEngine.checkHourly();
-            spendenergy(username, task);
+            new DBQuery("select score, username from users order by score desc limit "+MAX_SCORES)
+                .execute((ResultSet rs) ->
+            {
+                JSONBuilder jb = new JSONBuilder();
+                jb.beginArray();
+                while (rs.next())
+                {
+                    jb.beginObject();
+                    jb.property("score", rs.getLong(1));
+                    jb.property("username", rs.getString(2));
+                    jb.endObject();
+                }
+                jb.endArray();
+                response.setContentType("text/json");
+                response.getWriter().write(jb.toString());
+            });
         }
         catch (ServletException | IOException ex)
         {
@@ -38,7 +60,6 @@ public class GameSpendEnergy extends HttpServlet
         {
             throw new ServletException(ex.getMessage(), ex);
         }
-        response.setStatus(200);
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

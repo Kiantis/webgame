@@ -6,13 +6,11 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import static ki.webgame.GameEngine.spendenergy;
+import static ki.webgame.GameEngine.boostrage;
 
-@WebServlet("/spendenergy")
-public class GameSpendEnergy extends HttpServlet
+@WebServlet("/boostrage")
+public class GameBoostRage extends HttpServlet
 {
-    private static final String REQ_PAR_TASK = "task";
-    
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException
     {
@@ -23,10 +21,9 @@ public class GameSpendEnergy extends HttpServlet
         }
         
         String username = (String) request.getSession().getAttribute(Login.SES_ATT_USERNAME);
-        String task = request.getParameter(REQ_PAR_TASK);
         try
         {
-            spendenergy(username, task);
+            boostrage(username);
         }
         catch (ServletException | IOException ex)
         {

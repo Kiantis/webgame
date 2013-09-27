@@ -54,9 +54,9 @@ public class GameEngine
      */
     public static void spendenergy(String username, String task) throws Exception
     {
-        new DBQuery("update users set strength = "+C.MAX_STRENGTH+" where strength > 1").execute();
-        new DBQuery("update users set land = "+C.MAX_LAND+" where land > 1").execute();
-        new DBQuery("update users set energy = "+C.MAX_ENERGY+" where energy > 1").execute();
+        new DBQuery("update users set strength = "+C.MAX_STRENGTH+" where strength > "+C.MAX_STRENGTH).execute();
+        new DBQuery("update users set land = "+C.MAX_LAND+" where land > "+C.MAX_LAND).execute();
+        new DBQuery("update users set energy = "+C.MAX_ENERGY+" where energy > "+C.MAX_ENERGY).execute();
         switch (task)
         {
             case "S":
@@ -80,6 +80,28 @@ public class GameEngine
                     .execute();
                 break;
         }
+    }
+    
+    // -------------------------------------------------------------------------
+    
+    /**
+     * Spends a percentage of score points (10%, minimum points required: 100) to gain 10% rage.
+     * @param username username who is spending.
+     * @throws java.lang.Exception
+     */
+    public static void boostrage(String username) throws Exception
+    {
+        // Spend 10% of points for 10% of rage, only with minimum 100 points
+        new DBQuery("update users set "
+            + "rage = rage + "+C.BOOST_RAGE_GAIN_RAGE+", "
+            + "score = score - score * "+C.BOOST_RAGE_COST_SCORE+" "
+            + "where username = ? and score >= "+C.BOOST_RAGE_MIN_SCORE)
+            .addParameter(username)
+            .execute();
+        // Check the limits...
+        new DBQuery("update users set rage = "+C.MAX_RAGE+" where username = ? and rage > "+C.MAX_RAGE)
+            .addParameter(username)
+            .execute();
     }
     
     // -------------------------------------------------------------------------

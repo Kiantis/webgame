@@ -203,6 +203,19 @@ function spendenergy(task)
     });
 }
 
+function boostrage()
+{
+    if (!confirm("Do you want to spend 10% of your SCORE POINTS (minimum total required: 100) for 10% of rage?"))
+        return;
+    
+    $.ajax(
+    {
+        url: "boostrage",
+        method: "post",
+        success: getstats
+    });
+}
+
 function drawStat(type, value)
 {
     var id = "";
@@ -294,6 +307,7 @@ $(document).ready(function ()
         });
     });
     
+    $("#boost-rage").click(function (){boostrage();});
     $("#boost-strength").click(function (){spendenergy("S");});
     $("#boost-land").click(function (){spendenergy("L");});
 

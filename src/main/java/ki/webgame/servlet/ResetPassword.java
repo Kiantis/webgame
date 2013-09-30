@@ -2,53 +2,51 @@ package ki.webgame.servlet;
 
 import java.io.IOException;
 import java.sql.ResultSet;
+import java.util.Random;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import ki.webgame.DBQuery;
-import ki.webgame.JSONBuilder;
+import static ki.webgame.DigestUtils.sha512;
+import ki.webgame.MailManager;
 
-@WebServlet("/getscores")
-public class GameGetScores extends HttpServlet
+@WebServlet("/resetpassword")
+public class ResetPassword extends HttpServlet
 {
-    private static final int MAX_SCORES = 20;
-    
-    /** 
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException
     {
-        if(!IsLoggedIn.isLoggedIn(request))
+        String username = request.getParameter("username");
+        
+        if (username == null || username.isEmpty())
         {
-            response.setStatus(401);
+            response.setStatus(500);
             return;
         }
-        
+
         try
         {
-            new DBQuery("select score, username from users order by score desc limit "+MAX_SCORES)
-                .execute((ResultSet rs) ->
-            {
-                JSONBuilder jb = new JSONBuilder();
-                jb.beginArray();
-                while (rs.next())
+            String newcode = sha512(
+                String.valueOf(
+                    System.currentTimeMillis() + 
+                    new Random(System.currentTimeMillis()).nextDouble()
+                )).substring(0, 5);
+
+            new DBQuery("update users set checkcode = ? where username = ?")
+                .addParameter(newcode)
+                .addParameter(username)
+                .execute();
+            
+            new DBQuery("select email from users where username = ?")
+                .addParameter(username)
+                .execute((ResultSet rs) -> 
                 {
-                    jb.beginObject();
-                    jb.property("score", rs.getLong(1));
-                    jb.property("username", rs.getString(2));
-                    jb.endObject();
-                }
-                jb.endArray();
-                response.setContentType("text/json");
-                response.getWriter().write(jb.toString());
-            });
+                    if (!rs.next())
+                        return;
+                    MailManager.sendResetPasswordEmail(username, rs.getString(1), newcode);
+                });
         }
         catch (ServletException | IOException ex)
         {
@@ -58,6 +56,9 @@ public class GameGetScores extends HttpServlet
         {
             throw new ServletException(ex.getMessage(), ex);
         }
+        
+        response.setContentType("text/json");
+        response.getWriter().write("true");
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

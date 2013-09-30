@@ -35,4 +35,9 @@ public class C
     // Rage usage
     public static final double RAGE_GAIN_AS_DEFENDER = 0.01d;
     public static final double RAGE_CONSUME_AS_ATTACKER = 0.01d;
+    // Special race powers
+    public static final double FIRE_RAGE_GAIN_MULTIPLER = 5d;
+    public static final double AIR_ADDITIONAL_ENERGY_PER_MINUTE = 0.005d;
+    public static final double WATER_ENERGY_BOOST_MILTIPLIER = 0.5d;
+    public static final double EARTH_BONUS_DEFENSE = 0.2d;
 }

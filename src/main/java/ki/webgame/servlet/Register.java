@@ -1,6 +1,7 @@
 package ki.webgame.servlet;
 
 import java.io.IOException;
+import java.util.Random;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -8,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import ki.webgame.DBQuery;
 import static ki.webgame.DigestUtils.sha512;
+import ki.webgame.MailManager;
 
 @WebServlet("/register")
 public class Register extends HttpServlet
@@ -16,12 +18,11 @@ public class Register extends HttpServlet
         throws ServletException, IOException
     {
         String username = request.getParameter("username");
-        String password = request.getParameter("password");
-        String password2 = request.getParameter("password2");
+        String email = request.getParameter("email");
+        String race = request.getParameter("race");
         
-        if (username == null || password == null || password2 == null ||
-            username.isEmpty() || password.isEmpty() || password2.isEmpty() ||
-            !password.equals(password2))
+        if (username == null || email == null || race == null ||
+            username.isEmpty() || email.isEmpty() || race.isEmpty())
         {
             response.setStatus(500);
             return;
@@ -29,10 +30,24 @@ public class Register extends HttpServlet
 
         try
         {
-            new DBQuery("insert into users (username, password) values(?, ?)")
+            new DBQuery("insert into users (username, email, race, password) values(?, ?, ?, '!')")
                 .addParameter(username)
-                .addParameter(sha512(password))
+                .addParameter(email)
+                .addParameter(race)
                 .execute();
+ 
+            String newcode = sha512(
+                String.valueOf(
+                    System.currentTimeMillis() + 
+                    new Random(System.currentTimeMillis()).nextDouble()
+                )).substring(0, 5);
+
+            new DBQuery("update users set checkcode = ? where username = ?")
+                .addParameter(newcode)
+                .addParameter(username)
+                .execute();
+
+            MailManager.sendResetPasswordEmail(username, email, newcode);
         }
         catch (ServletException | IOException ex)
         {
@@ -43,7 +58,8 @@ public class Register extends HttpServlet
             throw new ServletException(ex.getMessage(), ex);
         }
         
-        response.sendRedirect("registerok.html");
+        response.setContentType("text/json");
+        response.getWriter().write("true");
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
@@ -84,5 +100,4 @@ public class Register extends HttpServlet
     {
         return "Short description";
     }// </editor-fold>
-
 }

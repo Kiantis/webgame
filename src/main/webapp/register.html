@@ -5,12 +5,43 @@
         <meta charset="UTF-8"/>
         <script type="text/javascript" src="js/jquery-2.0.3.min.js"></script>
         <script type="text/javascript">
+        
+            function getparams()
+            {
+                var paramString = window.location.search.substr(1);
+                var paramArray = paramString.split ("&");
+                var params = {};
+
+                for ( var i = 0; i < paramArray.length; i++)
+                {
+                    var tmp = paramArray[i].split("=");
+                    params[tmp[0]] = tmp[1];
+                }
+                
+                return params;
+            }
+        
             $(document).ready(function()
             {
+                $("input").on("keyup", function(e)
+                {
+                    if (e.which == 13)
+                    {
+                        e.preventDefault();
+                        register();
+                    }
+                });
+            
+                var params = getparams();
+                $("#username").val(params["username"]);
+                $("#email").val(params["email"]);
+                if (params["race"] === "F" || params["race"] === "A" || params["race"] === "W" || params["race"] === "E")
+                    $("#race").val(params["race"]);
+                
                 var keyupTimeout = null;
                 $("#username").keyup(function (e)
                 {
-                    if (keyupTimeout != null)
+                    if (keyupTimeout !== null)
                     {
                         clearTimeout(keyupTimeout);
                         keyupTimeout = null;
@@ -46,22 +77,57 @@
                     },
                     750);
                 });
-
-                $("#password, #password2").keyup(function ()
-                {
-                    var p1 = $("#password").val();
-                    var p2 = $("#password2").val();
-                    if (p1 == p2 && p1.length > 0)
-                        $("#password, #password2").removeClass("error");
-                    else
-                        $("#password, #password2").addClass("error");
-                    
-                    submitEnabledCheck();
-                });
-
-                // Trigger the event so it sets them to error for being blank
-                $("#username, #password, #password2").addClass("error");
                 
+                var keyupTimeoutEmail = null;
+                $("#email").keyup(function (e)
+                {
+                    if (keyupTimeoutEmail !== null)
+                    {
+                        clearTimeout(keyupTimeoutEmail);
+                        keyupTimeoutEmail = null;
+                    }
+                    keyupTimeoutEmail = setTimeout(function ()
+                    {
+                        $("#email").removeClass("ok");
+                        $("#email").removeClass("error");
+                        $("#email").addClass("checking");
+
+                        $.ajax(
+                        {
+                            url: "emailavailable",
+                            data: {email: $("#email").val()},
+                            dataType: "json",
+                            success: function (d)
+                            {
+                                if (d && $("#email").val().length > 0)
+                                {
+                                    $("#email").removeClass("checking");
+                                    $("#email").addClass("ok");
+                                }
+                                else
+                                {
+                                    $("#email").removeClass("checking");
+                                    $("#email").addClass("error");
+                                }
+                                
+                                var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                                var email = $("#email").val();
+
+                                if (!re.test(email))
+                                    $("#email").addClass("error");
+
+                                submitEnabledCheck();
+                            }
+                        });
+                        keyupTimeout = null;
+                    },
+                    750);
+                });
+                
+                // Trigger the event so it sets them to error for being blank
+                $("#username, #email").addClass("error");
+                $("#username").keyup();
+                $("#email").keyup();
                 submitEnabledCheck();
             });
             
@@ -79,15 +145,44 @@
                     return false;
                 return true;
             }
+            
+            function register()
+            {
+                if (!validate())
+                    return false;
+                
+                $.ajax(
+                {
+                    url: "register",
+                    method: "post",
+                    data:
+                    {
+                        username: $("#username").val(),
+                        email: $("#email").val(),
+                        race: $("#race").val()
+                    },
+                    dataType: "json",
+                    success: function(data)
+                    {
+                        if (data)
+                        {
+                            alert("Confirmation email sent with the confirmation code, needed for the next form.");
+                            location.href = "passwordreset.html";
+                        }
+                        else
+                            alert("Error occurred, try again with different username.");
+                    }
+                });
+            }
 
         </script>
         <style type="text/css">
             body
                 {text-align: center}
             form
-                {margin: 0 auto; width: 230px}
-            input[type="text"], input[type="password"]
-                {color: black; margin-left: 80px; display: block; width: 120px}
+                {margin: 0 auto; width: 350px}
+            input[type="text"], input[type="password"], select
+                {color: black; margin-left: 80px; display: block; width: 180px; margin-bottom: 8px}
             input[type="text"].checking
                 {color: gray}
             input[type="text"].ok
@@ -95,22 +190,40 @@
             input[type="text"].error, input[type="password"].error
                 {color: red; border-color: red;}
             label
-                {float: left; display: block; text-align: right; width: 100px; padding-right: 3px}
+                {float: left; display: block; text-align: right; width: 100px; padding-right: 5px}
+            .buttonbox
+                {display: block; margin-left: 105px; text-align: left}
             button
-                {display: block; margin-left: 103px}
+                {padding: 3px 5px}
         </style>
     </head>
     <body>
-        <h1></h1>
-        <h2>Registering for a new account</h2>
-        <form action="register" method="post" onsubmit="return validate()">
+        <h1>Registering for a new account</h1>
+        <div style="text-align: left; margin: 0 auto; width: 500px">
+            <h3>Races</h3>
+            <p>
+            Fire: gains x5 the rage value (5% instead of 1%), when loosing a defense.<br/>
+            Air: +0.5% energy per minute.<br/>
+            Water: spend only 5% of energy for boosting, instead of 10%.<br/>
+            Earth: +20% bonus on defense.
+            </p>
+        </div>
+        <form>
+            <p>A red box means the value is invalid or already used.</p>
             <label for="username">Username: </label><input id="username" type="text" name="username"/>
             <div style="clear: both"></div>
-            <label for="password">Password: </label><input id="password" type="password" name="password"/>
+            <label for="email">Email: </label><input id="email" type="text" name="email"/>
             <div style="clear: both"></div>
-            <label for="password">Password: </label><input id="password2" type="password" name="password2"/>
+            <label for="race">Race: </label><select id="race" name="race">
+                <option value="F">Fire</option>
+                <option value="A">Air</option>
+                <option value="W">Water</option>
+                <option value="E">Earth</option>
+            </select>
             <div style="clear: both"></div>
-            <button type="submit">Register</button>
+            <div class="buttonbox">
+                <button type="button" onclick="register()">Register</button>
+            </div>
         </form>
     </body>
 </html>

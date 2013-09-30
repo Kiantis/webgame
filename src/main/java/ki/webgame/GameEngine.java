@@ -15,13 +15,15 @@ import java.util.logging.Logger;
  */
 public class GameEngine
 {
+    private static final String CHECKHOURLY_QUERY_MINUTES = " ( abs(timestampdiff(MINUTE, current_timestamp(), lastupdate)) ) ";
+    
     private static final String CHECKHOURLY_QUERY = "update users set " +
         // if task is S, increment strength by 0.001 per time passed.
-        "strength = strength + (("+C.BASE_GAIN_STRENGTH+" * minute(timediff(now(), lastupdate))) * (if (task = 'S', 1, 0))), " +
+        "strength = strength + "+CHECKHOURLY_QUERY_MINUTES+" * "+C.BASE_GAIN_STRENGTH+" * (if (task = 'S', 1, 0)), " +
         // if task is L, increment landby 0.001 per time passed.
-        "land = land + (("+C.BASE_GAIN_LAND+" * minute(timediff(now(), lastupdate))) * (if (task = 'L', 1, 0))), " +
-        // increment energy by 0.01 * land per time passed.
-        "energy = energy + "+C.BASE_GAIN_ENERGY+" + ("+C.BASE_GAIN_ENERGY_PER_LAND+" * land * minute(timediff(now(), lastupdate))), " +
+        "land = land + "+CHECKHOURLY_QUERY_MINUTES+" * "+C.BASE_GAIN_LAND+" * (if (task = 'L', 1, 0)), " +
+        // increment energy by 0.01 * land per time passed. Also another bonus if user is 'A' (air)
+        "energy = energy + "+CHECKHOURLY_QUERY_MINUTES+" * ("+C.BASE_GAIN_ENERGY+" + ("+C.BASE_GAIN_ENERGY_PER_LAND+" * land) + ("+C.AIR_ADDITIONAL_ENERGY_PER_MINUTE + " * if (race = 'A', 1, 0))), " +
         // Update the timestamp or it will add undefinetly
         "lastupdate = now() " +
         // only select users whose at least an hour has passed.
@@ -60,8 +62,8 @@ public class GameEngine
         switch (task)
         {
             case "S":
-                // Spend 10% of energy for 5% of strength
-                new DBQuery("update users set strength = strength + "+C.ENERGY_BOOST_GAIN_STRENGTH+", energy = energy - "+C.ENERGY_BOOST_COST+" where username = ? and energy >= "+C.ENERGY_BOOST_COST)
+                // Spend 10% of energy for 5% of strength, energy has a discount if user is 'W' (water)
+                new DBQuery("update users set strength = strength + "+C.ENERGY_BOOST_GAIN_STRENGTH+", energy = energy - ("+C.ENERGY_BOOST_COST+" * if (race = 'W', "+C.WATER_ENERGY_BOOST_MILTIPLIER+", 1)) where username = ? and energy >= "+C.ENERGY_BOOST_COST)
                     .addParameter(username)
                     .execute();
                 // Check the limits...
@@ -70,8 +72,8 @@ public class GameEngine
                     .execute();
                 break;
             case "L":
-                // Spend 10% of energy for 5% of land
-                new DBQuery("update users set land = land + "+C.ENERGY_BOOST_GAIN_LAND+", energy = energy - "+C.ENERGY_BOOST_COST+" where username = ? and energy >= "+C.ENERGY_BOOST_COST)
+                // Spend 10% of energy for 5% of land, energy has a discount if user is 'W' (water)
+                new DBQuery("update users set land = land + "+C.ENERGY_BOOST_GAIN_LAND+", energy = energy - ("+C.ENERGY_BOOST_COST+" * if (race = 'W', "+C.WATER_ENERGY_BOOST_MILTIPLIER+", 1)) where username = ? and energy >= "+C.ENERGY_BOOST_COST)
                     .addParameter(username)
                     .execute();
                 // Check the limits...
@@ -175,9 +177,9 @@ public class GameEngine
             {
                 final AttackStats ar = new AttackStats();
                 new DBQuery(c,
-                      "select strength, land, energy, rage, id from users where username = ? "
+                      "select strength, land, energy, rage, id, race from users where username = ? "
                     + "union "
-                    + "select strength, land, energy, rage, id from users where username = ?")
+                    + "select strength, land, energy, rage, id, race from users where username = ?")
                     .addParameter(fromUser)
                     .addParameter(toUser)
                     .execute((ResultSet rs) ->
@@ -190,6 +192,7 @@ public class GameEngine
                         double aenergy = rs.getDouble(3);
                         double arage = rs.getDouble(4);
                         long aid = rs.getLong(5);
+                        String arace = rs.getString(6);
                         
                         if (!rs.next())
                             return;
@@ -199,13 +202,15 @@ public class GameEngine
                         double denergy = rs.getDouble(3);
                         double drage = rs.getDouble(4);
                         long did = rs.getLong(5);
+                        String drace = rs.getString(6);
 
                         // Here, calculate the attack results
                         // on attack, counts strength*energy
                         // on defense, counts land*energy
                         // this because if attacker loses, the defender gains some of the attacker strength
                         // if the defender loses, the attacker gains some of the defender land
-                        double vresult = astrength * aenergy + arage - (dland * C.DEFEND_LAND_FACTOR) * denergy - drage;
+                        // Also add the earth defense if the user has race 'E' (earth)
+                        double vresult = astrength * aenergy + arage - (dland * C.DEFEND_LAND_FACTOR) * denergy - drage - (drace.equals("E") ? C.EARTH_BONUS_DEFENSE : 0);
                         
                         // Decrement a 1% of rage (used above) for the user attacking and normalize it
                         new DBQuery(c, "update users set rage = rage - "+C.RAGE_CONSUME_AS_ATTACKER+" where id = ?").addParameter(aid).execute();
@@ -317,8 +322,8 @@ public class GameEngine
                 .addParameter(did)
                 .execute();
             
-            // Increment defender's RAGE if the attacker WON
-            new DBQuery(c, "update users set rage = rage + "+C.RAGE_GAIN_AS_DEFENDER+" where id = ?")
+            // Increment defender's RAGE if the attacker WON, defender has a multiplier if is 'F' (fire)
+            new DBQuery(c, "update users set rage = rage + ("+C.RAGE_GAIN_AS_DEFENDER+" * if (race = 'F', "+C.FIRE_RAGE_GAIN_MULTIPLER+", 1)) where id = ?")
                 .addParameter(did)
                 .execute();
         }

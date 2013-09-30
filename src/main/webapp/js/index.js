@@ -72,6 +72,12 @@ function getstats()
                 });
                 tr.append(td);
                 var td = $("<td>");
+                var race = data[i].race;
+                td.html(race);
+                td.addClass("race");
+                td.addClass("race-"+race);
+                tr.append(td);
+                var td = $("<td>");
                 var land = data[i].land;
                 land = land > 1 ? 1 : land;
                 td.html(parseFloat(land * 100).toFixed(1) + "%");

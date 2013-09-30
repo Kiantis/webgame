@@ -21,17 +21,54 @@
                             alert("Bad login");
                     }
                 });
-                // do not really submit the form
-                return false;
             }
+            
+            function resetpassword()
+            {
+                var username = $("#username").val();
+                if (username === null || username.length === 0)
+                {
+                    alert("Write your username in the field and then click the reset password button.");
+                    return;
+                }
+                $.ajax(
+                {
+                    url: "resetpassword",
+                    method: "post",
+                    data: {username: username},
+                    dataType: "json",
+                    success: function (data)
+                    {
+                        if (data)
+                        {
+                            alert("Confirmation email sent with the confirmation code, needed for the next form.");
+                            location.href = "passwordreset.html";
+                        }
+                        else
+                            alert("Error occurred, try again with different username.");
+                    }
+                });
+            }
+            
+            $(document).ready(function ()
+            {
+                $("input").on("keyup", function(e)
+                {
+                    if (e.which == 13)
+                    {
+                        e.preventDefault();
+                        login();
+                    }
+                });
+            });
         </script>
         <style type="text/css">
             body
                 {text-align: center}
             form
-                {margin: 0 auto; width: 230px}
-            input[type="text"], input[type="password"]
-                {color: black; margin-left: 80px; display: block; width: 120px}
+                {margin: 0 auto; width: 350px}
+            input[type="text"], input[type="password"], select
+                {color: black; margin-left: 80px; display: block; width: 180px; margin-bottom: 8px}
             input[type="text"].checking
                 {color: gray}
             input[type="text"].ok
@@ -39,19 +76,25 @@
             input[type="text"].error, input[type="password"].error
                 {color: red; border-color: red;}
             label
-                {float: left; display: block; text-align: right; width: 100px; padding-right: 3px}
+                {float: left; display: block; text-align: right; width: 100px; padding-right: 5px}
+            .buttonbox
+                {display: block; margin-left: 105px; text-align: left}
             button
-                {display: block; margin-left: 103px}
+                {padding: 3px 5px}
         </style>
     </head>
     <body>
         <h1></h1>
-        <form onsubmit="return login()">
+        <form>
             <label for="username">Username:</label><input id="username" type="text" name="username"/>
             <div style="clear: both"></div>
             <label for="password">Password:</label><input id="password" type="password" name="password"/>
             <div style="clear: both"></div>
-            <button type="submit">Login</button> <button type="button" onclick="location.href='register.html'">Register</button>
+            <div class="buttonbox">
+                <button type="button" onclick="login()">Login</button>
+                <button type="button" onclick="location.href='register.html'">Register</button>
+                <button type="button" onclick="resetpassword()">Reset password</button>
+            </div>
         </form>
     </body>
 </html>

@@ -31,7 +31,7 @@ public class GameGetStats extends HttpServlet
         {
             GameEngine.checkHourly();
             
-            new DBQuery("select score, strength, land, energy, rage, task, lastupdate from users where username = ?")
+            new DBQuery("select score, strength, land, energy, rage, task, lastupdate, race from users where username = ?")
                 .addParameter(username)
                 .execute((ResultSet rs) ->
             {
@@ -47,6 +47,7 @@ public class GameGetStats extends HttpServlet
                     jb.property("rage", rs.getDouble(5));
                     jb.property("task", rs.getString(6));
                     jb.property("lastupdate", rs.getTimestamp(7).getTime());
+                    jb.property("race", rs.getString(8));
                     jb.endObject();
                     response.setContentType("text/json");
                     response.getWriter().write(jb.toString());

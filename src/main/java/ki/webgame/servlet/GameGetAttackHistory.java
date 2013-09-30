@@ -8,7 +8,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import ki.webgame.DBQuery;
-import ki.webgame.GameEngine;
 import ki.webgame.JSONBuilder;
 
 @WebServlet("/getattackhistory")

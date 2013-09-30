@@ -172,6 +172,10 @@ public class DBManager
             + "(id integer not null auto_increment, "
             + "username VARCHAR(255) not null, "
             + "password VARCHAR(255) not null, "
+            + "email varchar(255) not null, "
+            + "registered integer not null default 0, "
+            + "checkcode varchar(255), "
+            + "race char(1) not null, "
             + "score bigint not null default 0,"
             + "strength double not null default 0.25, "
             + "land double not null default 0.25, "
@@ -179,8 +183,9 @@ public class DBManager
             + "rage double not null default 0, "
             // S = strength, L = land
             + "task char(1) not null default 'S', "
-            + "lastupdate timestamp not null default now(), "
+            + "lastupdate datetime not null default now(), "
             + "constraint unique key (username), "
+            + "constraint unique key (email), "
             + "primary key (id)) ENGINE=InnoDB CHARSET=UTF8",
             
             "create index users_username_idx on users (username)",
@@ -203,7 +208,7 @@ public class DBManager
             + "defender_strength_delta double not null, "
             + "defender_land_delta double not null, "
             + "defender_energy_delta double not null, "
-            + "attack_time timestamp not null, "
+            + "attack_time datetime not null, "
             + "constraint foreign key attack_history_attacker (attacking_userid) references users (id), "
             + "constraint foreign key attack_history_defender (defending_userid) references users (id), "
             + "primary key (id)) ENGINE=InnoDB CHARSET=UTF8",

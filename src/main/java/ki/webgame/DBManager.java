@@ -183,7 +183,7 @@ public class DBManager
             + "rage double not null default 0, "
             // S = strength, L = land
             + "task char(1) not null default 'S', "
-            + "lastupdate datetime not null default now(), "
+            + "lastupdate timestamp not null default current_timestamp(), "
             + "constraint unique key (username), "
             + "constraint unique key (email), "
             + "primary key (id)) ENGINE=InnoDB CHARSET=UTF8",
@@ -208,7 +208,7 @@ public class DBManager
             + "defender_strength_delta double not null, "
             + "defender_land_delta double not null, "
             + "defender_energy_delta double not null, "
-            + "attack_time datetime not null, "
+            + "attack_time timestamp not null, "
             + "constraint foreign key attack_history_attacker (attacking_userid) references users (id), "
             + "constraint foreign key attack_history_defender (defending_userid) references users (id), "
             + "primary key (id)) ENGINE=InnoDB CHARSET=UTF8",

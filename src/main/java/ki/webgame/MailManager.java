@@ -23,7 +23,7 @@ public class MailManager
         message.setContent(
             "Yourt username is: "+username+"\n\n"
             + "The confirmation code is: "+code+"\n\n"
-            + "Click this link to set/reset your password: http://www.dragon-rage.com/passwordreset.html?username="+username+"&code="+code,
+            + "Click this link to set/reset your password: http://www.dragon-rage.com/webgame/passwordreset.html?username="+username+"&code="+code,
             "text/plain");
         Transport.send(message);
     }

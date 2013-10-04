@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import ki.webgame.C.Race;
 
 /**
  * Game logic.
@@ -102,6 +103,34 @@ public class GameEngine
             .execute();
         // Check the limits...
         new DBQuery("update users set rage = "+C.MAX_RAGE+" where username = ? and rage > "+C.MAX_RAGE)
+            .addParameter(username)
+            .execute();
+    }
+    
+    /**
+     * Reincarnation can change your race but you will lose half points and restart with the default values.
+     * @param username username to change race
+     * @param race the new race
+     * @throws java.lang.Exception
+     */
+    public static void reincarnate(String username, Race race) throws Exception
+    {
+        if (race == null)
+            return;
+        
+        // Pay the score price (with the minimum score value) to change race
+        // Also reset all the values to start ones
+        // Also ensure race to be different, so that no cost would be spent
+        new DBQuery("update users set "
+            + "score = score * "+C.REINCARNATE_COST_SCORE_MULTIPLIER+", "
+            + "race = ?, "
+            + "strength = "+C.START_STRENGTH+", "
+            + "land = "+C.START_LAND+", "
+            + "energy = "+C.START_ENERGY+", "
+            + "rage = "+C.START_RAGE+", "
+            + "where race <> ? username = ? and score > "+C.REINCARNATE_MIN_SCORE)
+            .addParameter(race.name())
+            .addParameter(race.name())
             .addParameter(username)
             .execute();
     }

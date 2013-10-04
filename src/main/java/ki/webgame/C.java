@@ -2,6 +2,13 @@ package ki.webgame;
 
 public class C
 {
+    // Starting values
+    // WARNING: these values if changed won't change the default values of the database DDL!
+    // They will only affect reincarnation in this way
+    public static final double START_STRENGTH = 0.25d;
+    public static final double START_LAND = 0.25d;
+    public static final double START_ENERGY = 0.5d;
+    public static final double START_RAGE = 0d;
     // Maximum values, 1 means 100%
     public static final double MAX_STRENGTH = 1d;
     public static final double MAX_LAND = 1d;
@@ -41,4 +48,10 @@ public class C
     public static final double AIR_ADDITIONAL_ENERGY_PER_MINUTE = 0.005d;
     public static final double WATER_ENERGY_BOOST_MILTIPLIER = 0.5d;
     public static final double EARTH_BONUS_DEFENSE = 0.2d;
+    // Reincarnation minimal score value to trigger
+    public static final long REINCARNATE_MIN_SCORE = 100;
+    // Spend half score to reincarnate...
+    public static final double REINCARNATE_COST_SCORE_MULTIPLIER = 0.5d;
+    // Possible races - ensured to pass a valid value to function, internal use
+    public enum Race {F, A, W, E};
 }

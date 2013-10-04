@@ -11,10 +11,11 @@ public class C
     public static final double ENERGY_BOOST_COST = 0.1d;
     public static final double ENERGY_BOOST_GAIN_STRENGTH = 0.05d;
     public static final double ENERGY_BOOST_GAIN_LAND = 0.05d;
-    // Rage boosting: 10% of points (minimum 100 total present) for 10% rage
+    // Rage boosting: 10% of points (minimum 100 total present) for 10% rage, max boostable up to 10% rage total
     public static final int BOOST_RAGE_MIN_SCORE = 100;
     public static final double BOOST_RAGE_COST_SCORE = 0.1d;
     public static final double BOOST_RAGE_GAIN_RAGE = 0.1d;
+    public static final double BOOST_RAGE_MAX_RAGE = 0.1d;
     // Base gains: STRENGTH and LAND are multiplied by the time slot (0.1%)
     public static final double BASE_GAIN_STRENGTH = 0.001d;
     public static final double BASE_GAIN_LAND = 0.001d;

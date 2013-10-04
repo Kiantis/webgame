@@ -97,7 +97,7 @@ public class GameEngine
         new DBQuery("update users set "
             + "rage = rage + "+C.BOOST_RAGE_GAIN_RAGE+", "
             + "score = score - score * "+C.BOOST_RAGE_COST_SCORE+" "
-            + "where username = ? and score >= "+C.BOOST_RAGE_MIN_SCORE)
+            + "where username = ? and score >= "+C.BOOST_RAGE_MIN_SCORE + " and rage < "+C.BOOST_RAGE_MAX_RAGE)
             .addParameter(username)
             .execute();
         // Check the limits...

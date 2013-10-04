@@ -211,7 +211,7 @@ function spendenergy(task)
 
 function boostrage()
 {
-    if (!confirm("Do you want to spend 10% of your SCORE POINTS (minimum total required: 100) for 10% of rage?"))
+    if (!confirm("Do you want to spend 10% of your SCORE POINTS (minimum total required: 100) for 1% of rage, 10% rage max total?"))
         return;
     
     $.ajax(

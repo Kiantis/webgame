@@ -254,6 +254,9 @@ public class GameEngine
                         // when attacker is weaker, this value will be superior to 1
                         double scoreadjust = scoredelta == 0 || scoremax == 0 ? 1 : (scoremax+scoredelta)/scoremax;
                         
+                        if (dscore < 100 && ascore < 100)
+                            scoreadjust = 1;
+                        
                         double vresult = apower * scoreadjust - dpower;
                         
                         // Decrement a 1% of rage (used above) for the user attacking and normalize it

@@ -9,6 +9,8 @@ public class C
     public static final double START_LAND = 0.25d;
     public static final double START_ENERGY = 0.5d;
     public static final double START_RAGE = 0d;
+    // Minimum score value where to apply adjustments
+    public static final long SCORE_ADJUST_MIN_VAL = 100;
     // Maximum values, 1 means 100%
     public static final double MAX_STRENGTH = 1d;
     public static final double MAX_LAND = 1d;

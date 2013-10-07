@@ -90,6 +90,8 @@ function getstats()
                         var scoredelta = data[i].score - myscore;
                         var scoremax = data[i].score > myscore ? data[i].score : myscore;
                         var scoreadjust = scoredelta === 0 || scoremax === 0 ? 1 : (scoremax+scoredelta)/scoremax;
+                        if (data[i].score < 100 && myscore < 100)
+                            scoreadjust = 1;
                         td.html("x " + (scoreadjust * 100).toFixed(1) + "%")
                         td.addClass("adjust");
                         tr.append(td);

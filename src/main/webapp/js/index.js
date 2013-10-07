@@ -4,6 +4,8 @@ var COLOR_LAND = "#009000";
 var COLOR_ENERGY = "#0000FF";
 var COLOR_RAGE = "#FF0000";
 
+var myscore = 0;
+
 function getstats()
 {
     $.ajax(
@@ -16,6 +18,8 @@ function getstats()
             $("#username").text(data.username);
             
             $("#stats-value-score").text(data.score);
+            myscore = data.score;
+            
             // Cap is 100%...
             data.strength = data.strength > 1 ? 1 : data.strength;
             data.land = data.land > 1 ? 1 : data.land;
@@ -47,49 +51,57 @@ function getstats()
             $("#stats-value-nextupdate").text((d.getHours() < 10 ? "0" : "") + d.getHours() + ":"
                 + (d.getMinutes() < 10 ? "0" : "") + d.getMinutes() + ":"
                 + (d.getSeconds() < 10 ? "0" : "") + d.getSeconds());
-        }
-    });
-    $.ajax(
-    {
-        url: "gettargets",
-        method: "post",
-        dataType: "json",
-        success: function (data)
-        {
-            $("#targets tbody").empty();
-            for (var i = 0; i < data.length; i++)
+            
+            $.ajax(
             {
-                var tr = $("<tr>");
-                var td = $("<td>");
-                td.attr("username", data[i].username);
-                td.html(data[i].username);
-                td.addClass("username");
-                td.click(function ()
+                url: "gettargets",
+                method: "post",
+                dataType: "json",
+                success: function (data)
                 {
-                    var userToAttack = $(this).attr("username");
-                    if (userToAttack !== null && userToAttack.length > 0)
-                        attack(userToAttack);
-                });
-                tr.append(td);
-                var td = $("<td>");
-                var race = data[i].race;
-                td.html(race);
-                td.addClass("race");
-                td.addClass("race-"+race);
-                tr.append(td);
-                var td = $("<td>");
-                var land = data[i].land;
-                land = land > 1 ? 1 : land;
-                td.html(parseFloat(land * 100).toFixed(1) + "%");
-                td.addClass("land");
-                tr.append(td);
-                var td = $("<td>");
-                if (data[i].lastAttacker !== null && data[i].lastAttacker.length > 0)
-                    td.html(data[i].lastAttacker);
-                td.addClass("last-attacker");
-                tr.append(td);
-                $("#targets tbody").append(tr);
-            }
+                    $("#targets tbody").empty();
+                    for (var i = 0; i < data.length; i++)
+                    {
+                        var tr = $("<tr>");
+                        var td = $("<td>");
+                        td.attr("username", data[i].username);
+                        td.html(data[i].username);
+                        td.addClass("username");
+                        td.click(function ()
+                        {
+                            var userToAttack = $(this).attr("username");
+                            if (userToAttack !== null && userToAttack.length > 0)
+                                attack(userToAttack);
+                        });
+                        tr.append(td);
+                        var td = $("<td>");
+                        var race = data[i].race;
+                        td.html(race);
+                        td.addClass("race");
+                        td.addClass("race-"+race);
+                        tr.append(td);
+                        var td = $("<td>");
+                        var land = data[i].land;
+                        land = land > 1 ? 1 : land;
+                        td.html(parseFloat(land * 100).toFixed(1) + "%");
+                        td.addClass("land");
+                        tr.append(td);
+                        var td = $("<td>");
+                        var scoredelta = data[i].score - myscore;
+                        var scoremax = data[i].score > myscore ? data[i].score : myscore;
+                        var scoreadjust = scoredelta === 0 || scoremax === 0 ? 1 : (scoremax+scoredelta)/scoremax;
+                        td.html("x " + (scoreadjust * 100).toFixed(1) + "%")
+                        td.addClass("adjust");
+                        tr.append(td);
+                        var td = $("<td>");
+                        if (data[i].lastAttacker !== null && data[i].lastAttacker.length > 0)
+                            td.html(data[i].lastAttacker);
+                        td.addClass("last-attacker");
+                        tr.append(td);
+                        $("#targets tbody").append(tr);
+                    }
+                }
+            });
         }
     });
     $.ajax(
@@ -211,7 +223,7 @@ function spendenergy(task)
 
 function boostrage()
 {
-    if (!confirm("Do you want to spend 10% of your SCORE POINTS (minimum total required: 100) for 1% of rage, 10% rage max total?"))
+    if (!confirm("Do you want to spend 10% of your SCORE POINTS (minimum total required: 100) for 5% of rage, 50% rage max total?"))
         return;
     
     $.ajax(

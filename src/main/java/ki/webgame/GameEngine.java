@@ -206,9 +206,9 @@ public class GameEngine
             {
                 final AttackStats ar = new AttackStats();
                 new DBQuery(c,
-                      "select strength, land, energy, rage, id, race from users where username = ? "
+                      "select strength, land, energy, rage, id, race, score from users where username = ? "
                     + "union "
-                    + "select strength, land, energy, rage, id, race from users where username = ?")
+                    + "select strength, land, energy, rage, id, race, score from users where username = ?")
                     .addParameter(fromUser)
                     .addParameter(toUser)
                     .execute((ResultSet rs) ->
@@ -222,6 +222,7 @@ public class GameEngine
                         double arage = rs.getDouble(4);
                         long aid = rs.getLong(5);
                         String arace = rs.getString(6);
+                        long ascore = rs.getLong(7);
                         
                         if (!rs.next())
                             return;
@@ -232,6 +233,7 @@ public class GameEngine
                         double drage = rs.getDouble(4);
                         long did = rs.getLong(5);
                         String drace = rs.getString(6);
+                        long dscore = rs.getLong(7);
 
                         // Here, calculate the attack results
                         // on attack, counts strength*energy
@@ -239,7 +241,20 @@ public class GameEngine
                         // this because if attacker loses, the defender gains some of the attacker strength
                         // if the defender loses, the attacker gains some of the defender land
                         // Also add the earth defense if the user has race 'E' (earth)
-                        double vresult = astrength * aenergy + arage - (dland * C.DEFEND_LAND_FACTOR) * denergy - drage - (drace.equals("E") ? C.EARTH_BONUS_DEFENSE : 0);
+                        double apower = astrength * aenergy + arage;
+                        double dpower = (dland * C.DEFEND_LAND_FACTOR) * denergy - drage - (drace.equals("E") ? C.EARTH_BONUS_DEFENSE : 0);
+                        
+                        // reduce the attack power based on the difference of score
+                        // Positive: defender is stronger, help attacker
+                        // Negative: attacker is stronger, diminish attacker
+                        double scoredelta = dscore - ascore;
+                        double scoremax = dscore > ascore ? dscore : ascore;
+                        // This is a factor to multiply for the attacker power.
+                        // when attacker is stronger, this value will be inferior to 1
+                        // when attacker is weaker, this value will be superior to 1
+                        double scoreadjust = scoredelta == 0 || scoremax == 0 ? 1 : (scoremax+scoredelta)/scoremax;
+                        
+                        double vresult = apower * scoreadjust - dpower;
                         
                         // Decrement a 1% of rage (used above) for the user attacking and normalize it
                         new DBQuery(c, "update users set rage = rage - "+C.RAGE_CONSUME_AS_ATTACKER+" where id = ?").addParameter(aid).execute();

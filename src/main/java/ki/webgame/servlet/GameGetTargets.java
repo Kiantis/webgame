@@ -37,7 +37,7 @@ public class GameGetTargets extends HttpServlet
                     + "left join users u2 on attacking_userid = u2.id "
                     + "where defending_userid = (select id from users where username = u.username) "
                     + "order by attack_time desc limit 1), "
-                    + "u.race "
+                    + "u.race, u.score "
                 + "from users u where u.username <> ? and land >= 0.1 and registered = 1 order by land desc")
                 .addParameter(username)
                 .execute((ResultSet rs) ->
@@ -52,6 +52,7 @@ public class GameGetTargets extends HttpServlet
                         jb.property("land", rs.getString(2));
                         jb.property("lastAttacker", rs.getString(3));
                         jb.property("race", rs.getString(4));
+                        jb.property("score", rs.getLong(5));
                         jb.endObject();
                     }
                     jb.endArray();

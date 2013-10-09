@@ -242,7 +242,7 @@ public class GameEngine
                         // if the defender loses, the attacker gains some of the defender land
                         // Also add the earth defense if the user has race 'E' (earth)
                         double apower = astrength * aenergy + arage;
-                        double dpower = (dland * C.DEFEND_LAND_FACTOR) * denergy - drage - (drace.equals("E") ? C.EARTH_BONUS_DEFENSE : 0);
+                        double dpower = (dland * C.DEFEND_LAND_FACTOR) * denergy - (drace.equals("E") ? C.EARTH_BONUS_DEFENSE : 0);
                         
                         // reduce the attack power based on the difference of score
                         // Positive: defender is stronger, help attacker
